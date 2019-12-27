@@ -11,28 +11,37 @@ view {box-sizing: border-box;}
   height: 60rpx;
   font-size: 30rpx;
   border-bottom: 1rpx solid #ccc;
+  width: 99.995%;
+}
+.week > view {
+  width: 14.285%;
 }
 .date {
   margin-top: 10rpx;
   font-size: 30rpx;
-  padding: 19.9rpx;
+  width: 99.995%;
 }
 .date > view {
   /* background: rgb(86, 189, 1); */
+  border: 25rpx solid white;
   border-radius: 50%;
-  width: 70rpx;
-  height: 70rpx;
+  width: 14.285%;
+  height: 107.1375rpx;
 }
-.arrowTitle {
-  width: 100rpx;
-  height: 100%;
+.today { 
+  color: white;
+  background: red;
 }
+
 .arrow{
   width: 20rpx;
   height: 20rpx;
   border-top: 2px solid #333;
   border-right: 2px solid #333;
 }
+.w100{width: 100rpx;}
+.h_100{height: 100%;}
+.f1 {flex: 1;}
 .left{transform: rotate(-135deg);}
 .right{transform: rotate(45deg);}
 .flex {display: flex;}
@@ -42,7 +51,3 @@ view {box-sizing: border-box;}
 .jc_sa {justify-content: space-around;}
 .jc_c {justify-content: center;}
 .ai_c {align-items: center;}
-.today { 
-  color: yellow;
-  background: red;
-}

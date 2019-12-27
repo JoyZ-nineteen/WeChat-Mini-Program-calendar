@@ -1,5 +1,3 @@
-const app = getApp()
-import moment from '../../utils/common/moment.min'
 Page({
   data: {
     weekList: [],
@@ -10,10 +8,15 @@ Page({
   },
   onLoad() {
     this.data.weekList = ['日', '一', '二', '三', '四', '五', '六']
-    const currentYear = new Date().getFullYear()
-    const currentMonth = new Date().getMonth()
+    const currentYear = new Date().getFullYear(),
+    currentMonth = new Date().getMonth(),
+    currentDate = new Date().getDate()
+    this.setData({
+      year: currentYear,
+      month: currentMonth,
+      day: currentDate
+    })
     this.monthDate(currentYear, currentMonth)
-    this.setData(this.data)
   },
   // 获取当月的总天数
   getDayCountOfMonth(year, month) {
@@ -54,20 +57,25 @@ Page({
       currentMonthDaysList = [],
       nextMonthDaysList = []
     for (let i = 0; i < totalDays; i++) {
-      const add = {
-        year: year,
-        month: month
-      }
+      const add = {}
       if (i < startWeek) {
+        const {year: year1, month: month1} = this.returnMonth('prev')
+        add.year = year1
+        add.month = month1
         add.day = lastMonthDay - startWeek + 1 + i
         lastMonthDaysList.push(add)
       } else if (i < (startWeek + currentMonthDays)) {
+        add.year = year
+        add.month = month
         add.day = i + 1 - startWeek
-        if (currentYear === year && currentMonth === month && currentDate === i + 1 - startWeek) {
+        if (currentYear === year && currentMonth === month && currentDate === add.day) {
           add.today = true
         }
         currentMonthDaysList.push(add)
       } else {
+        const { year: year2, month: month2 } = this.returnMonth('next')
+        add.year = year2
+        add.month = month2
         add.day = i + 1 - (startWeek + currentMonthDays)
         nextMonthDaysList.push(add)
       }
@@ -76,8 +84,8 @@ Page({
       title: `${year}年${month + 1}月`,
     })
     this.data.monthList = [...lastMonthDaysList, ...currentMonthDaysList, ...nextMonthDaysList]
-    this.data.year = year
-    this.data.month = month
+    // this.data.year = year
+    // this.data.month = month
     this.setData(this.data)
   },
   /**
@@ -88,10 +96,20 @@ Page({
    *  2.1 month + 1
    *  2.2 如果 month == 11 那么 year + 1 month = 0
    */
+  /**
+   * 
+   */
   changeMonth(e) {
-    let { year, month } = this.data
     const { type } = e.currentTarget.dataset
-    if ( type === 'prev') {
+    const { year, month } = this.returnMonth(type)
+    this.data.year = year
+    this.data.month = month
+    this.setData(this.data)
+    this.monthDate(year, month)
+  },
+  returnMonth(type) {
+    let { year, month } = this.data
+    if (type === 'prev') {
       if (month === 0) {
         year--
         month = 11
@@ -106,7 +124,7 @@ Page({
         month++
       }
     }
-    this.monthDate(year, month)
+    return {year, month}
   },
   bindDateChange(e) {
     const dateArr = e.detail.value.split('-')

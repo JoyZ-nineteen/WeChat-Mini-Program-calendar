@@ -1,23 +1,21 @@
 <view class="calendar">
-  <view class="header flex jc_sb ai_c">
-    <view class="arrowTitle flex ai_c jc_c" bindtap="changeMonth" data-type="prev">
+  <view class="header flex">
+    <view class="w100 h_100 flex ai_c jc_c" bindtap="changeMonth" data-type="prev">
       <view class="arrow left"></view>
     </view>
-    <view>
-      <picker mode="date" fields="month" bindchange="bindDateChange">
-        {{year}}年{{month + 1}}月
-      </picker>
-    </view>
-    <view class="arrowTitle flex ai_c jc_c" bindtap="changeMonth" data-type="next">
+    <picker mode="date" fields="month" bindchange="bindDateChange" class="f1 h_100 flex ai_c jc_c">
+      {{year}}年{{month + 1}}月
+    </picker>
+    <view class="w100 h_100 flex ai_c jc_c" bindtap="changeMonth" data-type="next">
       <view class="arrow right"></view>
     </view>
   </view>
-  <view class="week flex ai_c jc_sa">
-    <view wx:for="{{weekList}}" wx:key="item">{{item}}</view>
+  <view class="week flex">
+    <view wx:for="{{weekList}}" wx:key="item" class="flex ai_c jc_c">{{item}}</view>
   </view>
-  <view class="flex fw">
-    <view class="flex ai_c jc_c date" wx:for="{{monthList}}" wx:key="item" bindtap="clickDay" data-item="{{item}}">
-      <view class="flex ai_c jc_c {{item.today ? 'today' : ''}}">{{item.day}}</view>
+  <view class="flex fw date">
+    <view class="flex ai_c jc_c {{item.today ? 'today' : ''}}" wx:for="{{monthList}}" wx:key="item" bindtap="clickDay" data-item="{{item}}">
+      {{item.day}}
     </view>
   </view>
 </view>
