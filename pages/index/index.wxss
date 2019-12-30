@@ -32,6 +32,13 @@ view {box-sizing: border-box;}
   color: white;
   background: red;
 }
+.clickDay {
+  color: white;
+  background: hotpink;
+}
+.currentMonth {
+  color: #ccc;
+}
 
 .arrow{
   width: 20rpx;

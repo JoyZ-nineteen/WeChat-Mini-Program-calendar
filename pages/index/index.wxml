@@ -4,7 +4,7 @@
       <view class="arrow left"></view>
     </view>
     <picker mode="date" fields="month" bindchange="bindDateChange" class="f1 h_100 flex ai_c jc_c">
-      {{year}}年{{month + 1}}月
+      {{year}}年{{showMonth}}月
     </picker>
     <view class="w100 h_100 flex ai_c jc_c" bindtap="changeMonth" data-type="next">
       <view class="arrow right"></view>
@@ -14,7 +14,12 @@
     <view wx:for="{{weekList}}" wx:key="item" class="flex ai_c jc_c">{{item}}</view>
   </view>
   <view class="flex fw date">
-    <view class="flex ai_c jc_c {{item.today ? 'today' : ''}}" wx:for="{{monthList}}" wx:key="item" bindtap="clickDay" data-item="{{item}}">
+    <view 
+    class="flex ai_c jc_c {{item.today ? 'today' : ''}} {{item.clickDay ? 'clickDay' : ''}} {{item.currentMonth === 'current' ? '' : 'currentMonth'}}" 
+    wx:for="{{monthList}}" 
+    wx:key="item" 
+    bindtap="clickDay" 
+    data-item="{{item}}">
       {{item.day}}
     </view>
   </view>

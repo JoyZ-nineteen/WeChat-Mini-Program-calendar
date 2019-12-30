@@ -6,17 +6,19 @@ Page({
     month: '',
     day: ''
   },
+  /**
+   * 一、头部年月显示
+   *    1.1 获取当年年月日，并且设置给data
+   * 二、中间星期显示
+   *    2.1 设置数组this.data.weekList = ['日', '一', '二', '三', '四', '五', '六']
+   * 三、下面日期显示
+   */
   onLoad() {
     this.data.weekList = ['日', '一', '二', '三', '四', '五', '六']
-    const currentYear = new Date().getFullYear(),
-    currentMonth = new Date().getMonth(),
-    currentDate = new Date().getDate()
-    this.setData({
-      year: currentYear,
-      month: currentMonth,
-      day: currentDate
-    })
-    this.monthDate(currentYear, currentMonth)
+    const year = new Date().getFullYear(),
+    month = new Date().getMonth()
+    this.setDate(year, month)
+    this.setMonthDate(year, month)
   },
   // 获取当月的总天数
   getDayCountOfMonth(year, month) {
@@ -40,18 +42,16 @@ Page({
    *  1.4 currentMonthDays + startWeek 如果不能被 7 整除
    *    totalDays = currentMonthDays + startWeek + (7 - (currentMonthDays + startWee) % 7)
    */
-  monthDate(year, month) {
-
+  setMonthDate(year, month) {
     const currentYear = new Date().getFullYear(),
     currentMonth = new Date().getMonth(),
-    currentDate = new Date().getDate()
-
-    const currentMonthDays = this.getDayCountOfMonth(year, month),
-      startWeek = this.getFirstDayOfMonth(year, month),
-      lastMonthDay = new Date(year, month, 0).getDate(),
-      totalDays = (currentMonthDays + startWeek) % 7 === 0 ? 
-      (currentMonthDays + startWeek) : 
-      currentMonthDays + startWeek + (7 - (currentMonthDays + startWeek) % 7)
+    currentDate = new Date().getDate(),
+    currentMonthDays = this.getDayCountOfMonth(year, month),
+    startWeek = this.getFirstDayOfMonth(year, month),
+    lastMonthDay = new Date(year, month, 0).getDate(),
+    totalDays = (currentMonthDays + startWeek) % 7 === 0 ? 
+    (currentMonthDays + startWeek) : 
+    currentMonthDays + startWeek + (7 - (currentMonthDays + startWeek) % 7)
 
     let lastMonthDaysList = [],
       currentMonthDaysList = [],
@@ -59,33 +59,35 @@ Page({
     for (let i = 0; i < totalDays; i++) {
       const add = {}
       if (i < startWeek) {
-        const {year: year1, month: month1} = this.returnMonth('prev')
-        add.year = year1
-        add.month = month1
+        const {year, month} = this.returnMonth('prev')
+        add.year = year
+        add.month = month
         add.day = lastMonthDay - startWeek + 1 + i
+        add.currentMonth = 'prev'
         lastMonthDaysList.push(add)
       } else if (i < (startWeek + currentMonthDays)) {
         add.year = year
         add.month = month
         add.day = i + 1 - startWeek
+        add.currentMonth = 'current'
         if (currentYear === year && currentMonth === month && currentDate === add.day) {
           add.today = true
         }
         currentMonthDaysList.push(add)
       } else {
-        const { year: year2, month: month2 } = this.returnMonth('next')
-        add.year = year2
-        add.month = month2
+        const { year, month } = this.returnMonth('next')
+        add.year = year
+        add.month = month
         add.day = i + 1 - (startWeek + currentMonthDays)
+        add.currentMonth = 'next'
         nextMonthDaysList.push(add)
       }
     }
+    const { showMonth } = this.data
     wx.setNavigationBarTitle({
-      title: `${year}年${month + 1}月`,
+      title: `${year}年${showMonth}月`,
     })
     this.data.monthList = [...lastMonthDaysList, ...currentMonthDaysList, ...nextMonthDaysList]
-    // this.data.year = year
-    // this.data.month = month
     this.setData(this.data)
   },
   /**
@@ -102,10 +104,8 @@ Page({
   changeMonth(e) {
     const { type } = e.currentTarget.dataset
     const { year, month } = this.returnMonth(type)
-    this.data.year = year
-    this.data.month = month
-    this.setData(this.data)
-    this.monthDate(year, month)
+    this.setDate(year, month)
+    this.setMonthDate(year, month)
   },
   returnMonth(type) {
     let { year, month } = this.data
@@ -130,9 +130,41 @@ Page({
     const dateArr = e.detail.value.split('-')
     let year = +dateArr[0]
     let month = +dateArr[1] - 1
-    this.monthDate(year, month)
+    this.setDate(year, month)
+    this.setMonthDate(year, month)
+  },
+  setDate(year, month, day) {
+    this.data.year = year
+    this.data.month = month
+    this.data.showMonth = this.formatNumber(month + 1)
+    this.setData(this.data)
   },
   clickDay(e) {
     console.log(e.currentTarget.dataset.item)
+    const { year, month, day } = e.currentTarget.dataset.item
+    const { monthList } = this.data
+    console.log(monthList)
+    monthList.forEach(v => {
+      v.clickDay = false
+    })
+    const currentDay = monthList.find(v => v.year === year && v.month === month && v.day === day)
+    currentDay.clickDay = true
+    this.setData({
+      monthList
+    })
+  },
+  formatNumber(n) {
+    n = n.toString()
+    return n[1] ? n : '0' + n
+  },
+  formatTime(date) {
+    const year = date.getFullYear()
+    const month = date.getMonth() + 1
+    const day = date.getDate()
+    const hour = date.getHours()
+    const minute = date.getMinutes()
+    const second = date.getSeconds()
+
+    return [year, month, day].map(formatNumber).join('/') + ' ' + [hour, minute, second].map(formatNumber).join(':')
   }
 })
