@@ -4,7 +4,9 @@ Page({
     monthList: [],
     year: '',
     month: '',
-    day: ''
+    day: '',
+    clickDayData: {},
+    firstDay: false
   },
   /**
    * 一、头部年月显示
@@ -47,15 +49,23 @@ Page({
     currentMonth = new Date().getMonth(),
     currentDate = new Date().getDate(),
     currentMonthDays = this.getDayCountOfMonth(year, month),
-    startWeek = this.getFirstDayOfMonth(year, month),
-    lastMonthDay = new Date(year, month, 0).getDate(),
-    totalDays = (currentMonthDays + startWeek) % 7 === 0 ? 
+    lastMonthDay = new Date(year, month, 0).getDate()
+    let startWeek = this.getFirstDayOfMonth(year, month)
+    if (this.data.firstDay) {
+      startWeek = startWeek === 0 ? startWeek = 6 : startWeek - 1
+      this.data.weekList = ['一', '二', '三', '四', '五', '六', '日']
+    } else {
+      this.data.weekList = ['日', '一', '二', '三', '四', '五', '六']
+    }
+
+    const totalDays = (currentMonthDays + startWeek) % 7 === 0 ? 
     (currentMonthDays + startWeek) : 
     currentMonthDays + startWeek + (7 - (currentMonthDays + startWeek) % 7)
 
     let lastMonthDaysList = [],
       currentMonthDaysList = [],
-      nextMonthDaysList = []
+      nextMonthDaysList = [];
+    
     for (let i = 0; i < totalDays; i++) {
       const add = {}
       if (i < startWeek) {
@@ -63,6 +73,7 @@ Page({
         add.year = year
         add.month = month
         add.day = lastMonthDay - startWeek + 1 + i
+        if (this.data.showCurrentDay) add.day = ''
         add.currentMonth = 'prev'
         lastMonthDaysList.push(add)
       } else if (i < (startWeek + currentMonthDays)) {
@@ -79,6 +90,7 @@ Page({
         add.year = year
         add.month = month
         add.day = i + 1 - (startWeek + currentMonthDays)
+        if (this.data.showCurrentDay) add.day = ''
         add.currentMonth = 'next'
         nextMonthDaysList.push(add)
       }
@@ -87,7 +99,24 @@ Page({
     wx.setNavigationBarTitle({
       title: `${year}年${showMonth}月`,
     })
-    this.data.monthList = [...lastMonthDaysList, ...currentMonthDaysList, ...nextMonthDaysList]
+    // this.data.monthList = [...lastMonthDaysList, ...currentMonthDaysList, ...nextMonthDaysList]
+
+    // 先写思路
+    // 一、点击的是19年12月，点击下一个月的时候没有了clickDay
+    //   1.1 拿到以前的monthList 和 现在的 monthList对比如果点击的那天没有一样的直接，把现在的赋值给以前的
+    //   1.2 如果有一样的就把现在的那一项的clickDay = true，其它的赋值为false
+    const monthList = [...lastMonthDaysList, ...currentMonthDaysList, ...nextMonthDaysList]
+    monthList.forEach(v => {
+      v.clickDay = false
+    })
+    const { clickDayData } = this.data
+    if (clickDayData) {
+      const clickMonthList = monthList.find(v => v.year === clickDayData.year && v.month === clickDayData.month && v.day === clickDayData.day)
+      if (clickMonthList) {
+        clickMonthList.clickDay = true
+      }
+    }
+    this.data.monthList = monthList
     this.setData(this.data)
   },
   /**
@@ -140,22 +169,35 @@ Page({
     this.setData(this.data)
   },
   clickDay(e) {
-    console.log(e.currentTarget.dataset.item)
-    const { year, month, day } = e.currentTarget.dataset.item
-    const { monthList } = this.data
-    console.log(monthList)
+    const { year, month, day, currentMonth } = e.currentTarget.dataset.item
+    const { monthList, showCurrentDay } = this.data
+    if (currentMonth !== 'current' && showCurrentDay) return
     monthList.forEach(v => {
       v.clickDay = false
     })
     const currentDay = monthList.find(v => v.year === year && v.month === month && v.day === day)
     currentDay.clickDay = true
+    console.log(currentDay)
     this.setData({
-      monthList
+      monthList,
+      clickDayData: currentDay
     })
   },
   formatNumber(n) {
     n = n.toString()
     return n[1] ? n : '0' + n
+  },
+  changeShowDay(e) {
+    this.data.showCurrentDay = e.detail.value
+    this.setData(this.data)
+    const { year, month } = this.data
+    this.setMonthDate(year, month)
+  },
+  changeFirstDay(e) {
+    this.data.firstDay = e.detail.value
+    this.setData(this.data)
+    const { year, month } = this.data
+    this.setMonthDate(year, month)
   },
   formatTime(date) {
     const year = date.getFullYear()
@@ -164,7 +206,6 @@ Page({
     const hour = date.getHours()
     const minute = date.getMinutes()
     const second = date.getSeconds()
-
     return [year, month, day].map(formatNumber).join('/') + ' ' + [hour, minute, second].map(formatNumber).join(':')
   }
 })

@@ -58,3 +58,8 @@ view {box-sizing: border-box;}
 .jc_sa {justify-content: space-around;}
 .jc_c {justify-content: center;}
 .ai_c {align-items: center;}
+.mt10 {margin-top: 10rpx;}
+.ml30 {margin-left: 30rpx;}
+.bt1 {border-top: 1rpx solid #ccc;}
+.bb1 {border-bottom: 1rpx solid #ccc;}
+.ft30 {font-size: 30rpx;}

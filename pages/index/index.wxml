@@ -13,7 +13,7 @@
   <view class="week flex">
     <view wx:for="{{weekList}}" wx:key="item" class="flex ai_c jc_c">{{item}}</view>
   </view>
-  <view class="flex fw date">
+  <view class="flex fw date bb1">
     <view 
     class="flex ai_c jc_c {{item.today ? 'today' : ''}} {{item.clickDay ? 'clickDay' : ''}} {{item.currentMonth === 'current' ? '' : 'currentMonth'}}" 
     wx:for="{{monthList}}" 
@@ -21,6 +21,16 @@
     bindtap="clickDay" 
     data-item="{{item}}">
       {{item.day}}
+    </view>
+  </view>
+  <view class="mt10 ft30 ml30">
+    <view>
+      仅显示本月日期
+      <switch checked="{{showCurrentDay}}" bindchange="changeShowDay"/>
+    </view>
+    <view>
+      周一
+      <switch checked="{{firstDay}}" bindchange="changeFirstDay"/>
     </view>
   </view>
 </view>
