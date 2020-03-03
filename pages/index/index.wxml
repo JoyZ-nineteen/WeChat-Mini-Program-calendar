@@ -26,11 +26,16 @@
   <view class="mt10 ft30 ml30">
     <view>
       仅显示本月日期
-      <switch checked="{{showCurrentDay}}" bindchange="changeShowDay"/>
+      <switch checked="{{showCurrentDay}}" bindchange="showDuring"/>
     </view>
     <view>
       周一
       <switch checked="{{firstDay}}" bindchange="changeFirstDay"/>
     </view>
+    <view>
+      背景圆形和方形
+      <switch checked="{{circular}}" bindchange="changeCircular"/>
+    </view>
   </view>
+  <!-- <button open-type="getUserInfo" bindgetuserinfo="wxLogin">登陆</button> -->
 </view>
